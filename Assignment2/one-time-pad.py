@@ -1,5 +1,6 @@
 import time
-
+import random
+import bitarray
 
 def generatePad(length):
     pad = ""
@@ -9,10 +10,19 @@ def generatePad(length):
         nmbr = str(timi)[-3:]
         ascii = int(nmbr) % 126
         pad += chr(ascii)
-    
+    ba = bitarray.bitarray()
+    ba.frombytes(pad.encode("utf-8"))
+    writeFile(str(ba), "Assignment2/pad.txt")
+    return pad
+
+# Generates the pad using the random library
+def generatePadOS(length):
+    pad = ""
+    while len(pad) < length:
+        pad += chr(random.randint(0, 126))
+
     writeFile(pad, "Assignment2/pad.txt")
     return pad
-    
 
 def encrypt(plaintext, pad):
     ciphertext = ""
@@ -21,8 +31,9 @@ def encrypt(plaintext, pad):
         xorValues = ord(plaintext[i]) ^ ord(pad[i])
         ciphertext += chr(xorValues)
 
-    writeFile(ciphertext, "Assignment2/ciphertext.txt")
-
+    ba = bitarray.bitarray()
+    ba.frombytes(ciphertext.encode("utf-8"))
+    writeFile(str(ba), "Assignment2/ciphertext.txt")
     return ciphertext
     
 def decrypt(ciphertext, pad):
@@ -33,13 +44,11 @@ def decrypt(ciphertext, pad):
         plaintext += chr(xorValues)
 
     writeFile(plaintext, "Assignment2/decrypted.txt")
-
     return plaintext
 
 def writeFile(text, path):
     with open(path, "w") as file:
         file.write(text)
-
 
 def main():
     plaintext = open("Assignment2/text.txt").read()
