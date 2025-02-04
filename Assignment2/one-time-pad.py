@@ -1,41 +1,52 @@
-"""fileIn = open("Assignment2/image.png", "rb")
-fileOut = open("Assignment2/newImage.png", "wb")
-
-inBytes = fileIn.read()
-fileOut.write(inBytes)
-
-fileOut.close()"""
-
-from bitarray import bitarray
-import math
+import time
 
 
-text = open("Assignment1/book.txt", "r").read()
-frequency = {"A": 0, "B": 0, "C": 0, "D": 0, "E": 0, "F": 0, "G": 0, "H": 0, "I": 0, "J": 0, "K": 0, "L": 0, "M": 0, "N": 0, "O": 0, "P": 0, "Q": 0, "R": 0, "S": 0, "T": 0, "U": 0, "V": 0, "W": 0, "X": 0, "Y": 0, "Z": 0}
-for line in text:
-    line = line.replace("\n", "")
-    line = line.replace(" ", "").upper()
-    for letter in line:
-        if letter in frequency:
-            frequency[letter] += 1
+def generatePad(length):
+    pad = ""
+    while len(pad) < length:
+        input("Press a button")
+        timi = time.time()
+        nmbr = str(timi)[-3:]
+        ascii = int(nmbr) % 126
+        pad += chr(ascii)
+    
+    writeFile(pad, "Assignment2/pad.txt")
+    return pad
+    
 
-frequency = dict(sorted(frequency.items(), key=lambda item: item[1], reverse=True))
+def encrypt(plaintext, pad):
+    ciphertext = ""
 
-def probabilityDistribution(freqDist):
-    probDist = {}
-    total = sum(freqDist.values())
-    for key in freqDist:
-        probDist[key] = freqDist[key] / total
-    return probDist
+    for i in range(len(plaintext)):
+        xorValues = ord(plaintext[i]) ^ ord(pad[i])
+        ciphertext += chr(xorValues)
 
-def entropy(probDist, base):
-    entropy = 0
-    for key in probDist:
-        entropy -= probDist[key] * math.log(probDist[key], base)
-    return entropy
+    writeFile(ciphertext, "Assignment2/ciphertext.txt")
 
-print(entropy(probabilityDistribution(frequency), 1114111))
-ba = bitarray.bitarray()
-bookInBinary = ba.frombytes(text.encode("utf-8")).tolist()
+    return ciphertext
+    
+def decrypt(ciphertext, pad):
+    plaintext = ""
 
-print(entropy(probabilityDistribution(bookInBinary,base=2)))
+    for i in range(len(ciphertext)):
+        xorValues = ord(ciphertext[i]) ^ ord(pad[i])
+        plaintext += chr(xorValues)
+
+    writeFile(plaintext, "Assignment2/decrypted.txt")
+
+    return plaintext
+
+def writeFile(text, path):
+    with open(path, "w") as file:
+        file.write(text)
+
+
+def main():
+    plaintext = open("Assignment2/text.txt").read()
+    textLength = len(plaintext)
+    pad = generatePad(textLength)
+    ciphertext = encrypt(plaintext, pad)
+    decrypted = decrypt(ciphertext, pad)
+    
+if __name__ == "__main__":
+    main()
