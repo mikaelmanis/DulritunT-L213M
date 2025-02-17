@@ -1,11 +1,16 @@
 const express = require('express');
-const http = require('http');
+const https = require('https');
 const path = require("path");
 const bodyParser = require('body-parser');
 const users = require('./data').userDB;
+const fs = require('fs');
 
 const app = express();
-const server = http.createServer(app);
+const options = {
+    key: fs.readFileSync('./server.key'),
+    cert: fs.readFileSync('./server.cert')
+  };
+
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname,'./public')));
@@ -71,7 +76,6 @@ app.get('/adminGetUsers', (req,res) => {
  
 });
 
-
-server.listen(3000, function(){
+https.createServer(options, app).listen(3000, function(){
     console.log("server is listening on port: 3000");
 });
